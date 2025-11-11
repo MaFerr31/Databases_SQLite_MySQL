@@ -52,13 +52,31 @@ with connection:
             '(%(name)s, %(age)s) '
         )
         data_many = (
-            {"name": "Gabriela", "age": 14},
+            {"name": "Rafaela", "age": 14},
             {"name": "Bruno", "age": 21},
             {"name": "Mauro", "age": 63},
+            {"name": "Marcelo", "age": 21},
+            {"name": "João", "age": 63},
+            {"name": "Isadora", "age": 85},
 
         )
         result = cursor.executemany(sql, data_many)
         #print(sql, data)
         #print(result)
     connection.commit()
+
+    #Lendo valores com SELECT
+    with connection.cursor() as cursor:
+        menor_id = int(input('Digite o menor id: '))
+        maior_id = int(input('Digite o maior id: '))
+        sql = (
+            f'SELECT * FROM {TABLE_NAME} '
+             'WHERE id BETWEEN %s AND %s '
+        )
+        cursor.execute(sql, (menor_id, maior_id))
+        print(cursor.mogrify(sql, (menor_id, maior_id)))
+        data_select = cursor.fetchall()
+        for row in data_select:
+            print(row)
+
 #connection.close()
