@@ -1,0 +1,1 @@
+### Repositório reservado para estudos de SQLite3 e Pymysql. (2025)
