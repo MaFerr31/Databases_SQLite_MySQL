@@ -1,8 +1,10 @@
 import pymysql  # type: ignore
 import os
+from typing import cast
 import dotenv # type: ignore
 
 TABLE_NAME = 'customers'
+CURRENT_CURSOR = pymysql.cursors.DictCursor
 dotenv.load_dotenv()
 
 connection = pymysql.connect(
@@ -10,7 +12,8 @@ connection = pymysql.connect(
     user=os.environ['MYSQL_USER'],
     password=os.environ['MYSQL_PASSWORD'],
     database=os.environ['MYSQL_DATABASE'],
-    charset='utf8mb4'
+    charset='utf8mb4',
+    cursorclass= CURRENT_CURSOR,
 )
 
 
@@ -93,7 +96,35 @@ with connection:
         connection.commit()
         cursor.execute(f'SELECT * FROM {TABLE_NAME}')
 
+        #for row in cursor.fetchall():
+           # print(row)
+
+    
+    with connection.cursor() as cursor:
+        cursor = cast(CURRENT_CURSOR, cursor)
+        sql = (
+            f'UPDATE {TABLE_NAME} '
+             'SET name=%s, idade=%s '
+             'WHERE id=%s'
+        )
+        cursor.execute(sql, ('Helena', 60, 3 ))
+        resultFromSelect = cursor.execute(f'SELECT * FROM {TABLE_NAME} ')
+
         for row in cursor.fetchall():
             print(row)
+
+        cursor.execute(f'SELECT id FROM {TABLE_NAME} ORDER BY id DESC LIMIT 1')
+        lastIdFromSelect = cursor.fetchone()
+        
+        print('resultFromSelect:', resultFromSelect)
+        print('rowcount:', cursor.rowcount)
+        print('lastrowid:', cursor.lastrowid)
+        print('lastIdFromSelect:', lastIdFromSelect['id'])
+
+
+        # cursor.scroll(-1)
+
+    connection.commit()
+        
 
 #connection.close()
